@@ -8,7 +8,7 @@ dxs = [1,  0, -1, 0]
 dys = [0, -1,  0, 1]
 
 # 움직이는 것을 진행합니다.
-for c_dir in dirs:
+for c_dir in dirs: 
     # 반시계방향 90' 회전
     if c_dir == 'L':
         curr_dir = (curr_dir - 1 + 4) % 4
