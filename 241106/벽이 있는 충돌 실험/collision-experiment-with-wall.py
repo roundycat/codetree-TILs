@@ -11,12 +11,21 @@ def reverse_direction(d):
 def simulate_marbles(N, marbles):
     # 현재 구슬의 위치 및 방향 초기화
     active_marbles = {(x, y): d for x, y, d in marbles}
-    time_limit = 2 * N * N  # 충분히 큰 시간 제한 설정
+    previous_states = set()  # 이전 상태를 저장하여 반복 확인
+    time = 0  # 경과 시간 초기화
     
-    for _ in range(time_limit):
+    while True:
+        # 현재 상태를 튜플 형태로 저장하여 반복되는지 확인
+        state = tuple(sorted(active_marbles.items()))
+        if state in previous_states:
+            # 이전에 나온 상태라면 반복이므로 시뮬레이션 종료
+            break
+        previous_states.add(state)
+        
         new_positions = {}  # 다음 위치를 저장
 
-        for (x, y), d in list(active_marbles.items()):
+        # 구슬 이동
+        for (x, y), d in active_marbles.items():
             dx, dy = directions[d]
             nx, ny = x + dx, y + dy
 
@@ -40,6 +49,8 @@ def simulate_marbles(N, marbles):
         # 더 이상 이동할 구슬이 없으면 종료
         if not active_marbles:
             break
+        
+        time += 1  # 경과 시간 증가
 
     # 남아있는 구슬의 개수 반환
     return len(active_marbles)
