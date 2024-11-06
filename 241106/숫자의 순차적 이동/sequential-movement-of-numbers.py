@@ -1,55 +1,60 @@
-def get_neighbors(x, y, n, grid):
-    # 여덟방향의 인접한 위치 좌표
-    directions = [(-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (1, 1)]
-    neighbors = []
-    
-    for dx, dy in directions:
-        nx, ny = x + dx, y + dy
-        if 0 <= nx < n and 0 <= ny < n:
-            neighbors.append((nx, ny))
-    
-    return neighbors
+# 변수 선언 및 입력:
+n, m = tuple(map(int, input().split()))
+grid = [
+    list(map(int, input().split()))
+    for _ in range(n)
+]
 
-def perform_turn(grid, n):
-    # 위치별로 숫자의 위치를 찾기 위한 딕셔너리
-    position = {}
+
+def in_range(x, y):
+    return 0 <= x and x < n and 0 <= y and y < n
+
+
+def find_pos(num):
     for i in range(n):
         for j in range(n):
-            position[grid[i][j]] = (i, j)
+            if grid[i][j] == num:
+                return (i, j)
+
+
+# 그 다음 위치를 찾아 반환합니다.
+def next_pos(pos):
+    dxs = [-1, -1, -1,  0, 0,  1, 1, 1]
+    dys = [-1,  0,  1, -1, 1, -1, 0, 1]
     
-    # 숫자 1부터 n*n까지 순서대로 처리
+    x, y = pos
+    
+    # 인접한 8개의 칸 중 가장 값이 큰 위치를 찾아 반환합니다.
+    max_val = -1
+    max_pos = (-1, -1)
+    for dx, dy in zip(dxs, dys):
+        nx, ny = x + dx, y + dy
+        if in_range(nx, ny) and grid[nx][ny] > max_val:
+            max_val, max_pos = grid[nx][ny], (nx, ny)
+    
+    return max_pos
+
+
+def swap(pos, next_pos):
+    (x, y), (nx, ny) = pos, next_pos
+    grid[x][y], grid[nx][ny] = grid[nx][ny], grid[x][y]
+
+
+def simulate():
+    # 번호가 증가하는 순으로
+    # 그 다음 위치를 구해
+    # 한 칸씩 움직입니다.
     for num in range(1, n * n + 1):
-        x, y = position[num]  # 현재 숫자의 위치
-        neighbors = get_neighbors(x, y, n, grid)  # 여덟방향 이웃 찾기
-        
-        # 인접한 숫자들 중 가장 큰 값 찾기
-        max_pos = x, y
-        max_value = grid[x][y]
-        
-        for nx, ny in neighbors:
-            if grid[nx][ny] > max_value:
-                max_value = grid[nx][ny]
-                max_pos = nx, ny
-        
-        # 가장 큰 이웃과 값 교환
-        if max_pos != (x, y):
-            grid[x][y], grid[max_pos[0]][max_pos[1]] = grid[max_pos[0]][max_pos[1]], grid[x][y]
-            # 위치 업데이트
-            position[grid[x][y]] = (x, y)
-            position[grid[max_pos[0]][max_pos[1]]] = max_pos
+        pos = find_pos(num)
+        max_pos = next_pos(pos)
+        swap(pos, max_pos)
 
-def solve(n, m, grid):
-    # m번의 턴 수행
-    for _ in range(m):
-        perform_turn(grid, n)
-    
-    # 결과 출력
-    for row in grid:
-        print(" ".join(map(str, row)))
 
-# 입력 처리
-n, m = map(int, input().split())
-grid = [list(map(int, input().split())) for _ in range(n)]
+# m번 시뮬레이션을 진행합니다.
+for _ in range(m):
+    simulate()
 
-# 문제 해결
-solve(n, m, grid)
+for i in range(n):
+    for j in range(n):
+        print(grid[i][j], end=" ")
+    print()
