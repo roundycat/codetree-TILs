@@ -21,15 +21,22 @@ def perform_turn(grid, n):
     for num in range(1, n * n + 1):
         x, y = position[num]  # 현재 숫자의 위치
         neighbors = get_neighbors(x, y, n, grid)  # 여덟방향 이웃 찾기
-        max_neighbor = max(neighbors, key=lambda pos: grid[pos[0]][pos[1]])  # 가장 큰 이웃 찾기
-        max_value = grid[max_neighbor[0]][max_neighbor[1]]
+        
+        # 인접한 숫자들 중 가장 큰 값 찾기
+        max_pos = x, y
+        max_value = grid[x][y]
+        
+        for nx, ny in neighbors:
+            if grid[nx][ny] > max_value:
+                max_value = grid[nx][ny]
+                max_pos = nx, ny
         
         # 가장 큰 이웃과 값 교환
-        if max_value > grid[x][y]:
-            grid[x][y], grid[max_neighbor[0]][max_neighbor[1]] = max_value, grid[x][y]
+        if max_pos != (x, y):
+            grid[x][y], grid[max_pos[0]][max_pos[1]] = grid[max_pos[0]][max_pos[1]], grid[x][y]
             # 위치 업데이트
             position[grid[x][y]] = (x, y)
-            position[grid[max_neighbor[0]][max_neighbor[1]]] = max_neighbor
+            position[grid[max_pos[0]][max_pos[1]]] = max_pos
 
 def solve(n, m, grid):
     # m번의 턴 수행
